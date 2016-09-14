@@ -2,26 +2,47 @@
 
 #include "coopgame.h"
 #include <GameFramework/InputSettings.h>
-#include "UInputRemappingFunctionLibrary.h"
+#include "InputRemappingFunctions.h"
 
-bool UUInputRemappingFunctionLibrary::RebindInputAction()
+bool UInputRemappingFunctions::RebindActionMapping(FInputActionKeyMapping from, FInputActionKeyMapping to)
 {
 	// get the default input settings
 	auto inputSettings = const_cast<UInputSettings*>(GetDefault<UInputSettings>());
 	if (!inputSettings)
 		return false;
 
+	// get the action mapping to rebind
+	auto actionMappingToRebind = FindActionKeyMapping(inputSettings, from);
+	if (!actionMappingToRebind)
+		return false;
+
+	// update it
+	*actionMappingToRebind = to;
+
+	// save 
+	inputSettings->SaveKeyMappings();
+
+	// rebuild inputs
+	for (TObjectIterator<UPlayerInput> playerInput; playerInput; ++playerInput)
+	{
+		playerInput->ForceRebuildingKeyMaps(true);
+	}
+	
+	return true;
+}
+
+FInputActionKeyMapping* UInputRemappingFunctions::FindActionKeyMapping(UInputSettings* inputSettings, FInputActionKeyMapping actionKeyMapping)
+{
 	// get the action mappings
 	auto& actions = inputSettings->ActionMappings;
 
-	// find the one we're looking for
+	// search for the one we're looking for
 	for (auto& inputActionKeyMapping : actions)
 	{
-		if (inputActionKeyMapping.ActionName == inputActionKeyMapping.ActionName)
-		{
-
-		}
+		if (inputActionKeyMapping.ActionName == actionKeyMapping.ActionName && inputActionKeyMapping.Key == actionKeyMapping.Key)
+			return &inputActionKeyMapping;
 	}
 
-	return false;
+	// didn't find anything, nullptr
+	return nullptr;
 }
