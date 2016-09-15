@@ -19,6 +19,9 @@ class COOPGAME_API UInputRemappingFunctions : public UBlueprintFunctionLibrary
 public:
 	UFUNCTION(BlueprintCallable, Category = "CoopGame|Input Remapping")
 	static bool RebindActionMapping(FInputActionKeyMapping from, FInputActionKeyMapping to);
+
+	UFUNCTION(BlueprintCallable, Category = "CoopGame|Input Remapping")
+	static bool GetActionKeyMapping(FName actionName, TArray<FInputActionKeyMapping>& bindings);
 	
 private:
 	// helper to find a key mapping, returns nullptr if it couldn't find a matching one

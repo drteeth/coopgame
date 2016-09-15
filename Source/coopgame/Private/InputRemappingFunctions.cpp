@@ -31,6 +31,27 @@ bool UInputRemappingFunctions::RebindActionMapping(FInputActionKeyMapping from, 
 	return true;
 }
 
+bool UInputRemappingFunctions::GetActionKeyMapping(FName actionName, TArray<FInputActionKeyMapping>& bindings)
+{
+	// get the default input settings
+	auto inputSettings = const_cast<UInputSettings*>(GetDefault<UInputSettings>());
+	if (!inputSettings)
+		return false;
+
+	// get the action mappings
+	auto& actions = inputSettings->ActionMappings;
+
+	// search for the ones we're looking for
+	for (auto& inputActionKeyMapping : actions)
+	{
+		if (inputActionKeyMapping.ActionName == actionName)
+			bindings.Push(inputActionKeyMapping);
+	}
+
+	// success if we found something
+	return bindings.Num() > 0;
+}
+
 FInputActionKeyMapping* UInputRemappingFunctions::FindActionKeyMapping(UInputSettings* inputSettings, FInputActionKeyMapping actionKeyMapping)
 {
 	// get the action mappings
